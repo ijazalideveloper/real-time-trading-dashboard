@@ -26,11 +26,11 @@ export function MarketStats({ ticker, priceData }: MarketStatsProps) {
       icon: Percent,
       color: priceData.changePercent >= 0 ? "text-emerald-500" : "text-red-500",
     },
-    {
-      label: "Volume",
-      value: priceData.volume.toLocaleString(),
-      icon: BarChart2,
-    },
+    // {
+    //   label: "Volume",
+    //   value: priceData.volume.toLocaleString(),
+    //   icon: BarChart2,
+    // },
     {
       label: "Status",
       value: "Live",
@@ -40,7 +40,7 @@ export function MarketStats({ ticker, priceData }: MarketStatsProps) {
   ]
 
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+    <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
       {stats.map((stat) => (
         <Card key={stat.label} className="bg-card border-border">
           <CardContent className="p-4">

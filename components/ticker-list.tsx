@@ -3,6 +3,7 @@
 import { cn } from "@/lib/utils"
 import type { Ticker, PriceData } from "@/lib/types"
 import { TrendingUp, TrendingDown } from "lucide-react"
+import Image from "next/image"
 
 interface TickerListProps {
   tickers: Ticker[]
@@ -37,7 +38,8 @@ export function TickerList({ tickers, prices, selectedTicker, onSelectTicker }: 
                   isPositive ? "bg-emerald-500/10 text-emerald-500" : "bg-red-500/10 text-red-500",
                 )}
               >
-                {ticker.symbol.slice(0, 2)}
+                <img src={ticker?.logo} alt={ticker.symbol} width={24} height={24} />
+                {/* {ticker?.logo || ticker.symbol.slice(0, 2)} */}
               </div>
               <div className="text-left">
                 <div className="font-semibold text-foreground">{ticker.symbol}</div>

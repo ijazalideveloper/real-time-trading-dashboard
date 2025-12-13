@@ -1,36 +1,34 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useState } from "react";
 import { TickerList } from "./ticker-list";
 import { PriceChart } from "./price-chart";
 import { MarketStats } from "./market-stats";
-import { mockTickers, mockPrices } from "@/lib/mock-data";
 import { Header } from "./common/header/Header";
-import type { Ticker, PriceData } from "@/lib/types";
+import { useStocks } from "@/hooks/useStocks";
+import { useChartData } from "@/hooks/useChartData";
 
 export function TradingDashboard() {
-  const [tickers, setTickers] = useState<Ticker[]>([]);
-  const [prices, setPrices] = useState<Record<string, PriceData>>({});
   const [selectedTicker, setSelectedTicker] = useState<string>("AAPL");
-
-  // Fetch initial data
-  useEffect(() => {
-    setTickers(mockTickers);
-    setPrices(mockPrices);
-  }, []);
-
-  // Real-time price updates via polling (simulates WebSocket)
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setPrices(mockPrices);
-    }, 2000); // Update every 2 seconds
-
-    return () => clearInterval(interval);
-  }, []);
+  const [selectedAssetId, setSelectedAssetId] = useState<string>('');
+  
+  const { tickers, prices, isLoading } = useStocks();
+  const { chartData } = useChartData(selectedAssetId);
 
   const currentTicker = tickers.find((t) => t.symbol === selectedTicker);
   const currentPrice = prices[selectedTicker];
-  console.log("tickers", tickers);
+  
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading market data...</p>
+        </div>
+      </div>
+    );
+  }
+  
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -45,7 +43,10 @@ export function TradingDashboard() {
               tickers={tickers}
               prices={prices}
               selectedTicker={selectedTicker}
-              onSelectTicker={setSelectedTicker}
+              onSelectTicker={(symbol) => {
+                setSelectedTicker(symbol);
+                setSelectedAssetId(symbol);
+              }}
             />
           </aside>
 
@@ -54,7 +55,11 @@ export function TradingDashboard() {
             <MarketStats ticker={currentTicker} priceData={currentPrice} />
 
             <div className="h-[500px] lg:h-[600px]">
-              <PriceChart ticker={currentTicker} currentPrice={currentPrice} />
+              <PriceChart 
+                ticker={currentTicker} 
+                currentPrice={currentPrice}
+                chartData={chartData}
+              />
             </div>
           </div>
         </div>
