@@ -12,6 +12,9 @@ import { TrendingUp, TrendingDown, Clock, BarChart3 } from "lucide-react"
 interface PriceChartProps {
   ticker: Ticker | undefined
   currentPrice: PriceData | undefined
+  chartData?: any[]
+  onRangeChange?: (days: number) => void
+  isChartLoading?: boolean
 }
 
 const timeRanges = [
@@ -21,13 +24,27 @@ const timeRanges = [
   { label: "3M", days: 90 },
 ]
 
-export function PriceChart({ ticker, currentPrice }: PriceChartProps) {
+export function PriceChart({ ticker, currentPrice, chartData = [], onRangeChange, isChartLoading = false }: PriceChartProps) {
   const [selectedRange, setSelectedRange] = useState(30)
 
   const history = useMemo(() => {
     if (!ticker) return []
+    
+    // Use real chart data if available, otherwise fallback to mock data
+    if (chartData && chartData.length > 0) {
+      return chartData.map(point => ({
+        timestamp: point.timestamp,
+        date: new Date(point.timestamp).toISOString().split('T')[0],
+        close: point.value,
+        open: point.value * 0.998,
+        high: point.value * 1.015,
+        low: point.value * 0.985,
+        volume: Math.floor(Math.random() * 10000000) + 5000000,
+      }))
+    }
+    
     return generateMockHistory(ticker.symbol, selectedRange)
-  }, [ticker, selectedRange])
+  }, [ticker, selectedRange, chartData])
 
   if (!ticker) {
     return (
@@ -85,7 +102,10 @@ export function PriceChart({ ticker, currentPrice }: PriceChartProps) {
               key={range.label}
               variant={selectedRange === range.days ? "default" : "ghost"}
               size="sm"
-              onClick={() => setSelectedRange(range.days)}
+              onClick={() => {
+                setSelectedRange(range.days);
+                onRangeChange?.(range.days);
+              }}
               className="text-xs px-3"
             >
               {range.label}
@@ -95,6 +115,11 @@ export function PriceChart({ ticker, currentPrice }: PriceChartProps) {
       </CardHeader>
 
       <CardContent className="flex-1 pt-4">
+        {isChartLoading ? (
+          <div className="h-full flex items-center justify-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+          </div>
+        ) : (
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart data={history} margin={{ top: 10, right: 10, left: -30, bottom: 0 }}>
             <defs>
@@ -138,6 +163,7 @@ export function PriceChart({ ticker, currentPrice }: PriceChartProps) {
             <Area type="monotone" dataKey="close" stroke={chartColor} strokeWidth={2} fill="url(#colorPrice)" />
           </AreaChart>
         </ResponsiveContainer>
+        )}
       </CardContent>
     </Card>
   )

@@ -9,11 +9,16 @@ import { useStocks } from "@/hooks/useStocks";
 import { useChartData } from "@/hooks/useChartData";
 
 export function TradingDashboard() {
-  const [selectedTicker, setSelectedTicker] = useState<string>("AAPL");
-  const [selectedAssetId, setSelectedAssetId] = useState<string>('');
+  const [selectedTicker, setSelectedTicker] = useState<string>("");
+  const [selectedDays, setSelectedDays] = useState<number>(30);
   
   const { tickers, prices, isLoading } = useStocks();
-  const { chartData } = useChartData(selectedAssetId);
+  const { chartData, isLoading: isChartLoading } = useChartData(selectedTicker, selectedDays);
+  
+  // Set first ticker as selected when data loads
+  if (!selectedTicker && tickers.length > 0) {
+    setSelectedTicker(tickers[0].symbol);
+  }
 
   const currentTicker = tickers.find((t) => t.symbol === selectedTicker);
   const currentPrice = prices[selectedTicker];
@@ -45,7 +50,6 @@ export function TradingDashboard() {
               selectedTicker={selectedTicker}
               onSelectTicker={(symbol) => {
                 setSelectedTicker(symbol);
-                setSelectedAssetId(symbol);
               }}
             />
           </aside>
@@ -59,6 +63,8 @@ export function TradingDashboard() {
                 ticker={currentTicker} 
                 currentPrice={currentPrice}
                 chartData={chartData}
+                onRangeChange={setSelectedDays}
+                isChartLoading={isChartLoading}
               />
             </div>
           </div>
