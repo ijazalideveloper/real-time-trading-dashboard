@@ -96,7 +96,7 @@ export function PriceChart({ ticker, currentPrice }: PriceChartProps) {
 
       <CardContent className="flex-1 pt-4">
         <ResponsiveContainer width="100%" height="100%">
-          <AreaChart data={history} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+          <AreaChart data={history} margin={{ top: 10, right: 10, left: -30, bottom: 0 }}>
             <defs>
               <linearGradient id="colorPrice" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="5%" stopColor={chartColor} stopOpacity={0.3} />
@@ -107,7 +107,7 @@ export function PriceChart({ ticker, currentPrice }: PriceChartProps) {
               dataKey="date"
               axisLine={false}
               tickLine={false}
-              tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 11 }}
+              tick={{ fill: "var(--muted-foreground)", fontSize: 11 }}
               tickFormatter={(value) => {
                 const date = new Date(value)
                 return selectedRange <= 7
@@ -119,7 +119,7 @@ export function PriceChart({ ticker, currentPrice }: PriceChartProps) {
             <YAxis
               axisLine={false}
               tickLine={false}
-              tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 11 }}
+              tick={{ fill: "var(--muted-foreground)", fontSize: 11 }}
               tickFormatter={(value) => `$${value.toLocaleString()}`}
               width={80}
               domain={["auto", "auto"]}
