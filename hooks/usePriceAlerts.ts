@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect, useCallback } from "react"
-import { createAlert, removeAlert, getAllAlerts, subscribeToAlerts, initializeAlerts, type PriceAlert } from "@/lib/price-alerts"
+import { createAlert, removeAlert, getAllAlerts, subscribeToAlerts, initializeAlerts, checkPriceAlerts, type PriceAlert } from "@/lib/price-alerts"
 
 export function usePriceAlerts(selectedSymbol: string, currentPrice: number | undefined) {
   const [alerts, setAlerts] = useState<PriceAlert[]>([])
@@ -16,7 +16,8 @@ export function usePriceAlerts(selectedSymbol: string, currentPrice: number | un
     initializeAlerts()
     const timeout = setTimeout(refreshAlerts, 100)
 
-    const unsubscribe = subscribeToAlerts(() => {
+    const unsubscribe = subscribeToAlerts((notification) => {
+      console.log('Alert notification received:', notification)
       refreshAlerts()
     })
 
@@ -40,6 +41,12 @@ export function usePriceAlerts(selectedSymbol: string, currentPrice: number | un
     if (isNaN(price) || price <= 0) return
 
     createAlert(selectedSymbol, price, condition)
+    
+    // Check immediately if alert should trigger
+    if (currentPrice) {
+      checkPriceAlerts(selectedSymbol, currentPrice)
+    }
+    
     refreshAlerts()
     setTargetPrice("")
   }
