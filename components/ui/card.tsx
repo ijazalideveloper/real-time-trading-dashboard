@@ -48,4 +48,14 @@ function CardContent({ className, ...props }: React.ComponentProps<"div">) {
   );
 }
 
-export { Card, CardHeader, CardTitle, CardContent };
+function CardDescription({ className, ...props }: React.ComponentProps<'div'>) {
+  return (
+    <div
+      data-slot="card-description"
+      className={cn('text-muted-foreground text-sm', className)}
+      {...props}
+    />
+  )
+}
+
+export { Card, CardHeader, CardTitle, CardContent, CardDescription };
