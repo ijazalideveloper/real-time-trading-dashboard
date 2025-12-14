@@ -2,7 +2,7 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 
 ## Demo
 
-🚀 [Live Demo](https://real-time-trading-dashboard-8515mkll3-ijaz-5023s-projects.vercel.app/)
+🚀 [Live Demo](https://real-time-trading-dashboard.vercel.app/)
 
 ## Getting Started
 
