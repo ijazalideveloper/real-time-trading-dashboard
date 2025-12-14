@@ -1,12 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { TickerList } from "./ticker-list";
 import { PriceChart } from "./price-chart";
 import { MarketStats } from "./market-stats";
 import { Header } from "./common/header/Header";
 import { useStocks } from "@/hooks/useStocks";
 import { useChartData } from "@/hooks/useChartData";
+import { useWebSocketData } from "@/hooks/useWebSocketData";
 
 export function TradingDashboard() {
   const [selectedTicker, setSelectedTicker] = useState<string>("");
@@ -15,13 +16,35 @@ export function TradingDashboard() {
   const { tickers, prices, isLoading } = useStocks();
   const { chartData, isLoading: isChartLoading } = useChartData(selectedTicker, selectedDays);
   
+  const symbols = useMemo(() => tickers.map(t => t.symbol), [tickers]);
+  const { liveData, isConnected } = useWebSocketData(symbols);
+  
+  // Merge live data with initial prices
+  const livePrices = useMemo(() => {
+    const merged = { ...prices };
+    Object.entries(liveData).forEach(([symbol, data]) => {
+      if (merged[symbol]) {
+        const oldPrice = merged[symbol].price;
+        const newPrice = data.price;
+        merged[symbol] = {
+          ...merged[symbol],
+          price: newPrice,
+          change: newPrice - oldPrice,
+          changePercent: ((newPrice - oldPrice) / oldPrice) * 100,
+          lastUpdate: data.timestamp
+        };
+      }
+    });
+    return merged;
+  }, [prices, liveData]);
+  
   // Set first ticker as selected when data loads
   if (!selectedTicker && tickers.length > 0) {
     setSelectedTicker(tickers[0].symbol);
   }
 
   const currentTicker = tickers.find((t) => t.symbol === selectedTicker);
-  const currentPrice = prices[selectedTicker];
+  const currentPrice = livePrices[selectedTicker];
   
   if (isLoading) {
     return (
@@ -46,7 +69,7 @@ export function TradingDashboard() {
           <aside className="lg:sticky lg:top-24 lg:h-[calc(100vh-120px)] overflow-y-auto rounded-xl bg-card border border-border p-3">
             <TickerList
               tickers={tickers}
-              prices={prices}
+              prices={livePrices}
               selectedTicker={selectedTicker}
               onSelectTicker={(symbol) => {
                 setSelectedTicker(symbol);
