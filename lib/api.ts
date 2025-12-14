@@ -1,7 +1,7 @@
 import axios from 'axios';
 
-const API_KEY = 'd4uoe21r01qnm7pn7vs0d4uoe21r01qnm7pn7vsg';
-const BASE_URL = 'https://finnhub.io/api/v1';
+const API_KEY = process.env.NEXT_PUBLIC_FINNHUB_API_KEY!;
+const BASE_URL = process.env.NEXT_PUBLIC_FINNHUB_BASE_URL!;
 
 interface FinnhubQuote {
   c: number; // current price
