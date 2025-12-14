@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { getPopularStocks } from '@/lib/api';
+import { initializeAlerts, checkPriceAlerts } from '@/lib/price-alerts';
 import type { Ticker, PriceData } from '@/lib/types';
 
 export function useStocks() {
@@ -10,6 +11,9 @@ export function useStocks() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    // Initialize alerts on first load
+    initializeAlerts();
+    
     const loadData = async () => {
       try {
         const response = await getPopularStocks();
@@ -34,6 +38,9 @@ export function useStocks() {
             volume: 0,
             lastUpdate: Date.now()
           };
+          
+          // Check price alerts for each stock
+          checkPriceAlerts(stock.symbol, stock.price);
         });
         
         setTickers(tickerData);

@@ -8,6 +8,7 @@ import { Header } from "./common/header/Header";
 import { useStocks } from "@/hooks/useStocks";
 import { useChartData } from "@/hooks/useChartData";
 import { useWebSocketData } from "@/hooks/useWebSocketData";
+import { PriceAlertPanel } from "./price-alert-panel";
 
 export function TradingDashboard() {
   const [selectedTicker, setSelectedTicker] = useState<string>("");
@@ -88,6 +89,13 @@ export function TradingDashboard() {
                 chartData={chartData}
                 onRangeChange={setSelectedDays}
                 isChartLoading={isChartLoading}
+              />
+            </div>
+
+            <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
+              <PriceAlertPanel
+                selectedSymbol={selectedTicker}
+                currentPrice={currentPrice?.price}
               />
             </div>
           </div>
