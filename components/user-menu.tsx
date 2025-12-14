@@ -13,6 +13,9 @@ import {
 import { LogOut, User, Settings } from "lucide-react"
 
 export function UserMenu() {
+  const { user, logout } = useAuth()
+
+  if (!user) return null
 
   return (
     <DropdownMenu>
@@ -21,19 +24,19 @@ export function UserMenu() {
           <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
             <User className="h-4 w-4 text-primary" />
           </div>
-          <span className="hidden sm:inline-block text-sm font-medium">Demo User</span>
+          <span className="hidden sm:inline-block text-sm font-medium">{user.name}</span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-56">
         <DropdownMenuLabel>
           <div className="flex flex-col space-y-1">
-            <p className="text-sm font-medium">Demo User</p>
-            <p className="text-xs text-muted-foreground">demo@tradingview.com</p>
+            <p className="text-sm font-medium">{user.name}</p>
+            <p className="text-xs text-muted-foreground">{user.email}</p>
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         
-        <DropdownMenuItem className="text-destructive focus:text-destructive">
+        <DropdownMenuItem onClick={logout} className="text-destructive focus:text-destructive">
           <LogOut className="mr-2 h-4 w-4" />
           Sign out
         </DropdownMenuItem>
