@@ -3,6 +3,7 @@
 import { Card, CardContent } from "@/components/ui/card"
 import type { PriceData, Ticker } from "@/lib/types"
 import { Activity, BarChart2, DollarSign, Percent } from "lucide-react"
+import { useMarketStatus } from "@/hooks/useMarketStatus"
 
 interface MarketStatsProps {
   ticker: Ticker | undefined
@@ -10,6 +11,8 @@ interface MarketStatsProps {
 }
 
 export function MarketStats({ ticker, priceData }: MarketStatsProps) {
+  const { status } = useMarketStatus()
+  
   if (!ticker || !priceData) {
     return null
   }
@@ -33,9 +36,9 @@ export function MarketStats({ ticker, priceData }: MarketStatsProps) {
     // },
     {
       label: "Status",
-      value: "Live",
+      value: status.text,
       icon: Activity,
-      color: "text-emerald-500",
+      color: status.color,
     },
   ]
 

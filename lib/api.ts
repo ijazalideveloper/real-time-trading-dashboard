@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { cache } from 'react';
 
 const API_KEY = process.env.NEXT_PUBLIC_FINNHUB_API_KEY!;
 const BASE_URL = process.env.NEXT_PUBLIC_FINNHUB_BASE_URL!;
@@ -36,7 +37,7 @@ const apiClient = axios.create({
 
 const POPULAR_SYMBOLS = ['AAPL', 'GOOGL', 'MSFT', 'AMZN', 'TSLA', 'NVDA', 'META', 'JPM'];
 
-export const getStockQuote = async (symbol: string) => {
+export const getStockQuote = cache(async (symbol: string) => {
   try {
     const response = await apiClient.get<FinnhubQuote>('/quote', {
       params: { symbol, token: API_KEY }
@@ -47,9 +48,9 @@ export const getStockQuote = async (symbol: string) => {
     console.warn(`Failed to fetch quote for ${symbol}:`, error);
     return null;
   }
-};
+});
 
-export const getStockProfile = async (symbol: string) => {
+export const getStockProfile = cache(async (symbol: string) => {
   try {
     const response = await apiClient.get<StockProfile>('/stock/profile2', {
       params: { symbol, token: API_KEY }
@@ -59,9 +60,9 @@ export const getStockProfile = async (symbol: string) => {
     console.warn(`Failed to fetch profile for ${symbol}:`, error);
     return null;
   }
-};
+});
 
-export const getCandles = async (symbol: string, days: number = 30) => {
+export const getCandles = cache(async (symbol: string, days: number = 30) => {
   try {
     // Get current quote to generate realistic chart data
     const quote = await getStockQuote(symbol);
@@ -94,9 +95,27 @@ export const getCandles = async (symbol: string, days: number = 30) => {
     console.warn(`Failed to generate chart data for ${symbol}:`, error);
     return { s: 'no_data' };
   }
-};
+});
 
-export const getPopularStocks = async () => {
+export const getMarketStatus = cache(async () => {
+  try {
+    const response = await apiClient.get('/stock/market-status', {
+      params: {
+        exchange: 'US',
+        token: API_KEY
+      }
+    });
+    return {
+      isOpen: response.data.isOpen || false,
+      exchange: response.data.exchange || 'US'
+    };
+  } catch (error) {
+    console.warn('Failed to fetch market status:', error);
+    return { isOpen: false, exchange: 'US' };
+  }
+});
+
+export const getPopularStocks = cache(async () => {
   try {
     const stocksData = await Promise.all(
       POPULAR_SYMBOLS.map(async (symbol) => {
@@ -130,6 +149,6 @@ export const getPopularStocks = async () => {
     console.warn('Failed to fetch popular stocks:', error);
     return { data: [], total: 0, page: 1, limit: 10 };
   }
-};
+});
 
 export type { FinnhubQuote, StockProfile };
