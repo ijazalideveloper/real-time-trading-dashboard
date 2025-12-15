@@ -85,8 +85,8 @@ export function PriceChart({ ticker, currentPrice, chartData = [], onRangeChange
                 )}
               >
                 {isPositive ? <TrendingUp className="w-4 h-4" /> : <TrendingDown className="w-4 h-4" />}
-                {isPositive ? "+" : ""}${Math.abs(currentPrice.change).toFixed(2)} ({isPositive ? "+" : ""}
-                {currentPrice.changePercent.toFixed(2)}%)
+                {isPositive ? "+" : "-"}${Math.abs(currentPrice.change).toFixed(2)} ({isPositive ? "+" : "-"}
+                {Math.abs(currentPrice.changePercent).toFixed(2)}%)
               </div>
               <div className="flex items-center justify-end gap-1 text-xs text-muted-foreground mt-1">
                 <Clock className="w-3 h-3" />

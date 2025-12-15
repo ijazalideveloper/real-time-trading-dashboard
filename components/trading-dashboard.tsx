@@ -25,13 +25,14 @@ export function TradingDashboard() {
     const merged = { ...prices };
     Object.entries(liveData).forEach(([symbol, data]) => {
       if (merged[symbol]) {
-        const oldPrice = merged[symbol].price;
+        // Get the previous close price from the initial API data
+        const previousClose = merged[symbol].price - merged[symbol].change;
         const newPrice = data.price;
         merged[symbol] = {
           ...merged[symbol],
           price: newPrice,
-          change: newPrice - oldPrice,
-          changePercent: ((newPrice - oldPrice) / oldPrice) * 100,
+          change: newPrice - previousClose,
+          changePercent: ((newPrice - previousClose) / previousClose) * 100,
           lastUpdate: data.timestamp
         };
       }
@@ -46,7 +47,7 @@ export function TradingDashboard() {
 
   const currentTicker = tickers.find((t) => t.symbol === selectedTicker);
   const currentPrice = livePrices[selectedTicker];
-  
+  console.log("currentPrice", currentPrice)
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
