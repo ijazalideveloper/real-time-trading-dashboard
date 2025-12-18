@@ -2,8 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 
-const API_KEY = 'd4uoe21r01qnm7pn7vs0d4uoe21r01qnm7pn7vsg';
-const WS_URL = `wss://ws.finnhub.io?token=${API_KEY}`;
+
 
 interface WebSocketMessage {
   type: string;
@@ -24,24 +23,15 @@ export function useWebSocketData(symbols: string[]) {
   useEffect(() => {
     if (symbols.length === 0) return;
 
-    const ws = new WebSocket(WS_URL);
-    wsRef.current = ws;
+    const url = `/api/websocket?symbols=${symbols.join(',')}`;
+    const eventSource = new EventSource(url);
 
-    ws.onopen = () => {
-      console.log('Connected to Finnhub WebSocket');
+    eventSource.onopen = () => {
+      console.log('Connected to WebSocket proxy');
       setIsConnected(true);
-      
-      // Subscribe to symbols
-      symbols.forEach(symbol => {
-        if (!subscribedSymbols.current.has(symbol)) {
-          ws.send(JSON.stringify({ type: 'subscribe', symbol }));
-          subscribedSymbols.current.add(symbol);
-          console.log(`Subscribed to ${symbol}`);
-        }
-      });
     };
 
-    ws.onmessage = (event) => {
+    eventSource.onmessage = (event) => {
       try {
         const message: WebSocketMessage = JSON.parse(event.data);
         
@@ -57,29 +47,18 @@ export function useWebSocketData(symbols: string[]) {
           });
         }
       } catch (error) {
-        console.error('Error parsing WebSocket message:', error);
+        console.error('Error parsing message:', error);
       }
     };
 
-    ws.onerror = (error) => {
-      console.error('WebSocket Error:', error);
-      setIsConnected(false);
-    };
-
-    ws.onclose = () => {
-      console.log('WebSocket Disconnected');
+    eventSource.onerror = (error) => {
+      console.error('EventSource Error:', error);
       setIsConnected(false);
     };
 
     return () => {
-      // Unsubscribe from symbols
-      symbols.forEach(symbol => {
-        if (subscribedSymbols.current.has(symbol)) {
-          ws.send(JSON.stringify({ type: 'unsubscribe', symbol }));
-          subscribedSymbols.current.delete(symbol);
-        }
-      });
-      ws.close();
+      eventSource.close();
+      setIsConnected(false);
     };
   }, [symbols]);
 
