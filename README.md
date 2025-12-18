@@ -4,7 +4,7 @@ A modern, real-time stock trading dashboard built with Next.js 16, featuring liv
 
 ## 🚀 Demo
 
-[Live Demo](https://real-time-trading-dashboard.vercel.app/)
+[Live Demo](https://real-time-trading-dashboard-psi.vercel.app/)
 
 <img width="1701" height="883" alt="Trading Dashboard Screenshot" src="https://github.com/user-attachments/assets/53811708-ab6f-498e-a1b8-2db6e5845855" />
 
